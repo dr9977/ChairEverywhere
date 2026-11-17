@@ -1,6 +1,5 @@
 
 using System;
-using System.Windows.Forms;
 using GTA;
 using GTA.Math;
 
@@ -11,12 +10,8 @@ public class ChairEverywhere : Script
     private readonly Model chairModel =
         new Model("prop_chair_01a");
 
-    private bool enabled = true;
-    private bool f7WasDown = false;
-
     private bool wasInVehicle = false;
-    private bool vehicleStateInitialized = false;
-    private bool chairRequestedAfterExit = false;
+    private bool initialized = false;
 
     private const float ChairDistance = 1.35f;
 
@@ -29,18 +24,6 @@ public class ChairEverywhere : Script
 
     private void OnTick(object sender, EventArgs e)
     {
-        bool f7Down = Game.IsKeyPressed(Keys.F7);
-
-        if (f7Down && !f7WasDown)
-        {
-            enabled = !enabled;
-
-            if (!enabled)
-                DeleteChair();
-        }
-
-        f7WasDown = f7Down;
-
         Ped player = Game.Player.Character;
 
         if (player == null ||
@@ -48,43 +31,46 @@ public class ChairEverywhere : Script
             player.IsDead)
         {
             DeleteChair();
-            chairRequestedAfterExit = false;
+            initialized = false;
             return;
         }
 
         bool inVehicle = player.IsInVehicle();
 
-        if (!vehicleStateInitialized)
+        // تهيئة حالة اللاعب عند بداية تشغيل المود
+        if (!initialized)
         {
             wasInVehicle = inVehicle;
-            vehicleStateInitialized = true;
+            initialized = true;
+            return;
         }
-        else if (inVehicle)
+
+        // عند ركوب أي سيارة
+        if (inVehicle)
         {
             wasInVehicle = true;
-            chairRequestedAfterExit = false;
             DeleteChair();
             return;
         }
-        else if (wasInVehicle)
+
+        // عند النزول من السيارة
+        if (wasInVehicle)
         {
             wasInVehicle = false;
-            chairRequestedAfterExit = true;
+            CreateChair(player);
         }
+    }
 
-        if (!enabled || !chairRequestedAfterExit)
-        {
-            DeleteChair();
-            return;
-        }
-
-        if (chair != null && chair.Exists())
-            return;
+    private void CreateChair(Ped player)
+    {
+        DeleteChair();
 
         if (!chairModel.IsLoaded)
         {
             chairModel.Request(1000);
-            return;
+
+            if (!chairModel.IsLoaded)
+                return;
         }
 
         // تحديد مكان الكرسي بجانب اللاعب مرة واحدة
@@ -92,13 +78,13 @@ public class ChairEverywhere : Script
             player.Position +
             player.RightVector * ChairDistance;
 
-        // الحصول على ارتفاع الأرض دون تعديل ارتفاع المجسم
+        // تحديد مستوى الأرض
         float groundHeight = World.GetGroundHeight(target);
 
         if (groundHeight > -1000f)
             target.Z = groundHeight;
 
-        // إنشاء الكرسي في الموقع المحدد دون ربطه باللاعب
+        // إنشاء الكرسي دون ربطه باللاعب
         chair = World.CreateProp(
             chairModel,
             target,
@@ -116,7 +102,9 @@ public class ChairEverywhere : Script
     private void DeleteChair()
     {
         if (chair != null && chair.Exists())
+        {
             chair.Delete();
+        }
 
         chair = null;
     }
@@ -126,6 +114,8 @@ public class ChairEverywhere : Script
         DeleteChair();
 
         if (chairModel.IsLoaded)
+        {
             chairModel.MarkAsNoLongerNeeded();
+        }
     }
 }
