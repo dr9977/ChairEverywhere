@@ -1,0 +1,27 @@
+
+name: Build ChairEverywhere
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build DLL
+        run: msbuild src/ChairEverywhere.csproj /p:Configuration=Release
+
+      - name: Upload DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChairEverywhere-DLL
+          path: src/bin/Release/net48/ChairEverywhere.dll
