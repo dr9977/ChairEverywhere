@@ -52,7 +52,7 @@ public class ChairEverywhere : Script
             return;
         }
 
-        bool inVehicle = player.IsInVehicle;
+        bool inVehicle = player.IsInVehicle();
 
         if (!vehicleStateInitialized)
         {
