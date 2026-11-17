@@ -7,6 +7,7 @@ using GTA.Math;
 public class ChairEverywhere : Script
 {
     private Prop chair;
+
     private readonly Model chairModel =
         new Model("prop_chair_01a");
 
@@ -18,6 +19,7 @@ public class ChairEverywhere : Script
     public ChairEverywhere()
     {
         Interval = 100;
+
         Tick += OnTick;
         Aborted += OnAborted;
     }
@@ -31,7 +33,9 @@ public class ChairEverywhere : Script
             enabled = !enabled;
 
             if (!enabled)
+            {
                 DeleteChair();
+            }
         }
 
         f7WasDown = f7Down;
@@ -64,7 +68,7 @@ public class ChairEverywhere : Script
             chair = World.CreateProp(
                 chairModel,
                 target,
-                player.Heading,
+                new Vector3(0f, 0f, player.Heading),
                 false,
                 true
             );
@@ -82,7 +86,9 @@ public class ChairEverywhere : Script
     private void DeleteChair()
     {
         if (chair != null && chair.Exists())
+        {
             chair.Delete();
+        }
 
         chair = null;
     }
@@ -92,6 +98,8 @@ public class ChairEverywhere : Script
         DeleteChair();
 
         if (chairModel.IsLoaded)
+        {
             chairModel.MarkAsNoLongerNeeded();
+        }
     }
 }
