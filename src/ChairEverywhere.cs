@@ -14,12 +14,15 @@ public class ChairEverywhere : Script
     private bool enabled = true;
     private bool f7WasDown = false;
 
+    private bool wasInVehicle = false;
+    private bool vehicleStateInitialized = false;
+    private bool chairRequestedAfterExit = false;
+
     private const float FollowDistance = 1.35f;
 
     public ChairEverywhere()
     {
         Interval = 100;
-
         Tick += OnTick;
         Aborted += OnAborted;
     }
@@ -33,9 +36,7 @@ public class ChairEverywhere : Script
             enabled = !enabled;
 
             if (!enabled)
-            {
                 DeleteChair();
-            }
         }
 
         f7WasDown = f7Down;
@@ -47,11 +48,35 @@ public class ChairEverywhere : Script
             player.IsDead)
         {
             DeleteChair();
+            chairRequestedAfterExit = false;
             return;
         }
 
-        if (!enabled)
+        bool inVehicle = player.IsInVehicle;
+
+        if (!vehicleStateInitialized)
+        {
+            wasInVehicle = inVehicle;
+            vehicleStateInitialized = true;
+        }
+        else if (inVehicle)
+        {
+            wasInVehicle = true;
+            chairRequestedAfterExit = false;
+            DeleteChair();
             return;
+        }
+        else if (wasInVehicle)
+        {
+            wasInVehicle = false;
+            chairRequestedAfterExit = true;
+        }
+
+        if (!enabled || !chairRequestedAfterExit)
+        {
+            DeleteChair();
+            return;
+        }
 
         if (!chairModel.IsLoaded)
         {
@@ -86,9 +111,7 @@ public class ChairEverywhere : Script
     private void DeleteChair()
     {
         if (chair != null && chair.Exists())
-        {
             chair.Delete();
-        }
 
         chair = null;
     }
@@ -98,8 +121,6 @@ public class ChairEverywhere : Script
         DeleteChair();
 
         if (chairModel.IsLoaded)
-        {
             chairModel.MarkAsNoLongerNeeded();
-        }
     }
 }
