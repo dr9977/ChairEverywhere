@@ -18,7 +18,7 @@ public class ChairEverywhere : Script
     private bool vehicleStateInitialized = false;
     private bool chairRequestedAfterExit = false;
 
-    private const float FollowDistance = 1.35f;
+    private const float ChairDistance = 1.35f;
 
     public ChairEverywhere()
     {
@@ -78,34 +78,39 @@ public class ChairEverywhere : Script
             return;
         }
 
+        if (chair != null && chair.Exists())
+            return;
+
         if (!chairModel.IsLoaded)
         {
             chairModel.Request(1000);
             return;
         }
 
+        // تحديد مكان الكرسي بجانب اللاعب مرة واحدة
         Vector3 target =
             player.Position +
-            player.RightVector * FollowDistance;
+            player.RightVector * ChairDistance;
 
-        if (chair == null || !chair.Exists())
+        // الحصول على ارتفاع الأرض دون تعديل ارتفاع المجسم
+        float groundHeight = World.GetGroundHeight(target);
+
+        if (groundHeight > -1000f)
+            target.Z = groundHeight;
+
+        // إنشاء الكرسي في الموقع المحدد دون ربطه باللاعب
+        chair = World.CreateProp(
+            chairModel,
+            target,
+            new Vector3(0f, 0f, player.Heading),
+            false,
+            true
+        );
+
+        if (chair != null && chair.Exists())
         {
-            chair = World.CreateProp(
-                chairModel,
-                target,
-                new Vector3(0f, 0f, player.Heading),
-                false,
-                true
-            );
-
-            if (chair == null || !chair.Exists())
-                return;
-
             chair.IsPersistent = true;
         }
-
-        chair.Position = target;
-        chair.Heading = player.Heading;
     }
 
     private void DeleteChair()
