@@ -14,11 +14,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore src/ChairEverywhere.csproj
 
       - name: Build DLL
-        run: msbuild src/ChairEverywhere.csproj /p:Configuration=Release
+        run: dotnet build src/ChairEverywhere.csproj -c Release --no-restore
 
       - name: Upload DLL
         uses: actions/upload-artifact@v4
