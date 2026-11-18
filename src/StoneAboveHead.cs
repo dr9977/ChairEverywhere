@@ -12,12 +12,12 @@ public class StoneAboveHead : Script
 
     private const int HeadBone = 31086;
 
-    // المسافة فوق الرأس: 50 سم
+    // 50 سم فوق الرأس
     private const float Height = 0.50f;
 
     public StoneAboveHead()
     {
-        Interval = 100;
+        Interval = 0;
         Tick += OnTick;
         Aborted += OnAborted;
     }
@@ -34,43 +34,46 @@ public class StoneAboveHead : Script
             return;
         }
 
-        if (stone != null && stone.Exists())
-            return;
-
         if (!stoneModel.IsLoaded)
         {
             stoneModel.Request(1000);
             return;
         }
 
-        stone = World.CreateProp(
-            stoneModel,
-            player.Position,
-            Vector3.Zero,
-            false,
-            true
-        );
-
         if (stone == null || !stone.Exists())
-            return;
+        {
+            stone = World.CreateProp(
+                stoneModel,
+                player.Position,
+                Vector3.Zero,
+                false,
+                true
+            );
 
-        stone.IsPersistent = true;
+            if (stone == null || !stone.Exists())
+                return;
 
-        stone.AttachTo(
-            player,
-            HeadBone,
-            new Vector3(0f, 0f, Height),
-            Vector3.Zero
+            stone.IsPersistent = true;
+        }
+
+        // تحديث موقع الحجر فوق الرأس باستمرار
+        Vector3 headPosition =
+            player.GetBonePosition(HeadBone);
+
+        stone.Position =
+            headPosition + new Vector3(0f, 0f, Height);
+
+        stone.Rotation = new Vector3(
+            0f,
+            0f,
+            player.Heading
         );
     }
 
     private void DeleteStone()
     {
         if (stone != null && stone.Exists())
-        {
-            stone.Detach();
             stone.Delete();
-        }
 
         stone = null;
     }
