@@ -1,5 +1,5 @@
 
-name: Build ChairEverywhere
+name: Build GTA V Mods
 
 on:
   workflow_dispatch:
@@ -19,14 +19,30 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
+      # Build ChairEverywhere
+      - name: Restore Chair
         run: dotnet restore src/ChairEverywhere.csproj
 
-      - name: Build DLL
+      - name: Build Chair
         run: dotnet build src/ChairEverywhere.csproj -c Release --no-restore
 
-      - name: Upload DLL
+      # Build StoneAboveHead
+      - name: Restore Stone
+        run: dotnet restore src/StoneAboveHead.csproj
+
+      - name: Build Stone
+        run: dotnet build src/StoneAboveHead.csproj -c Release --no-restore
+
+      # Upload Chair DLL
+      - name: Upload Chair DLL
         uses: actions/upload-artifact@v4
         with:
           name: ChairEverywhere-DLL
           path: src/bin/Release/net48/ChairEverywhere.dll
+
+      # Upload Stone DLL
+      - name: Upload Stone DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: StoneAboveHead-DLL
+          path: src/bin/Release/net48/StoneAboveHead.dll
