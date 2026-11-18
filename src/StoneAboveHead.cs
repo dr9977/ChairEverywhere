@@ -10,9 +10,7 @@ public class StoneAboveHead : Script
     private readonly Model stoneModel =
         new Model("prop_rock_4_cl_2");
 
-    private const int HeadBone = 31086;
-
-    // 50 سم فوق الرأس
+    // المسافة فوق الرأس: 50 سم
     private const float Height = 0.50f;
 
     public StoneAboveHead()
@@ -56,10 +54,11 @@ public class StoneAboveHead : Script
             stone.IsPersistent = true;
         }
 
-        // تحديث موقع الحجر فوق الرأس باستمرار
+        // قراءة موقع عظمة الرأس
         Vector3 headPosition =
-            player.GetBonePosition(HeadBone);
+            player.Bones[Bone.SkelHead].Position;
 
+        // وضع الحجر على ارتفاع 50 سم فوق الرأس
         stone.Position =
             headPosition + new Vector3(0f, 0f, Height);
 
