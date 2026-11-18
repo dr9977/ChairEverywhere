@@ -7,6 +7,7 @@ using GTA.Native;
 public class StoneAboveHead : Script
 {
     private Prop stone;
+
     private readonly Model stoneModel =
         new Model("prop_rock_4_cl_2");
 
@@ -16,7 +17,6 @@ public class StoneAboveHead : Script
     public StoneAboveHead()
     {
         Interval = 0;
-
         Tick += OnTick;
         Aborted += OnAborted;
     }
@@ -39,11 +39,9 @@ public class StoneAboveHead : Script
             if (!stoneModel.IsLoaded)
                 return;
 
-            Vector3 initialPosition = player.Position;
-
             stone = World.CreateProp(
                 stoneModel,
-                initialPosition,
+                player.Position,
                 false,
                 false
             );
@@ -59,7 +57,7 @@ public class StoneAboveHead : Script
             );
         }
 
-        // Disable all physical interaction
+        // Stone only: disable collision
         Function.Call(
             Hash.SET_ENTITY_COLLISION,
             stone.Handle,
@@ -67,6 +65,7 @@ public class StoneAboveHead : Script
             false
         );
 
+        // Disable gravity and physics
         Function.Call(
             Hash.SET_ENTITY_HAS_GRAVITY,
             stone.Handle,
@@ -79,7 +78,7 @@ public class StoneAboveHead : Script
             false
         );
 
-        // Get the exact head bone position
+        // Get head position
         Vector3 headPosition = Function.Call<Vector3>(
             Hash.GET_PED_BONE_COORDS,
             player.Handle,
@@ -89,14 +88,14 @@ public class StoneAboveHead : Script
             0f
         );
 
-        // Place the stone 50 cm above the head
+        // Position 50 cm above head
         Vector3 targetPosition = new Vector3(
             headPosition.X,
             headPosition.Y,
             headPosition.Z + Height
         );
 
-        // Move the stone without physical forces
+        // Move without physics
         Function.Call(
             Hash.SET_ENTITY_COORDS_NO_OFFSET,
             stone.Handle,
