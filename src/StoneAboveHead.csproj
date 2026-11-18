@@ -1,0 +1,24 @@
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>StoneAboveHead</AssemblyName>
+    <RootNamespace>StoneAboveHead</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="ScriptHookVDotNet3">
+      <HintPath>../lib/ScriptHookVDotNet3.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="StoneAboveHead.cs" />
+  </ItemGroup>
+
+</Project>
