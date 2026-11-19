@@ -13,6 +13,10 @@ public class StoneAboveHead : Script
     // 3 أمتار فوق الرأس
     private const float Height = 3.0f;
 
+    // Native تعطيل التصادم بالكامل
+    private const ulong DisableCollisionHash =
+        0x9EBC85ED0FFFE51C;
+
     public StoneAboveHead()
     {
         Interval = 0;
@@ -24,7 +28,9 @@ public class StoneAboveHead : Script
     {
         Ped player = Game.Player.Character;
 
-        if (player == null || !player.Exists() || player.IsDead)
+        if (player == null ||
+            !player.Exists() ||
+            player.IsDead)
         {
             DeleteStone();
             return;
@@ -52,27 +58,27 @@ public class StoneAboveHead : Script
             stone.IsPersistent = true;
         }
 
-        // تحديد موقع الرأس
+        // موقع الرأس
         Vector3 headPosition =
             player.Bones[Bone.SkelHead].Position;
 
-        // وضع الحجر 3 أمتار فوق الرأس
+        // الحجر على ارتفاع 3 أمتار
         stone.Position =
             headPosition + new Vector3(0f, 0f, Height);
 
-        // تدوير الحجر مع اتجاه اللاعب
+        // اتجاه الحجر
         stone.Rotation = new Vector3(
             0f,
             0f,
             player.Heading
         );
 
-        // تعطيل التصادم مباشرة باستخدام Native Hash
+        // تعطيل التصادم بالكامل
         Function.Call(
-            (Hash)0x1A9205C1B9EE827F,
+            (Hash)DisableCollisionHash,
             stone.Handle,
-            false,
-            false
+            true,
+            true
         );
     }
 
