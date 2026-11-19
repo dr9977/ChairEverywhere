@@ -10,12 +10,11 @@ public class StoneAboveHead : Script
     private readonly Model stoneModel =
         new Model("prop_rock_4_cl_2");
 
-    // 3 أمتار فوق الرأس
-    private const float Height = 3.0f;
+    // ارتفاع الحجر 1.5 متر فوق الرأس
+    private const float Height = 1.5f;
 
-    // Native تعطيل التصادم بالكامل
-    private const ulong DisableCollisionHash =
-        0x9EBC85ED0FFFE51C;
+    // Native: SET_ENTITY_COLLISION
+    private const ulong CollisionNative = 0x1A9205C1B9EE827F;
 
     public StoneAboveHead()
     {
@@ -28,9 +27,7 @@ public class StoneAboveHead : Script
     {
         Ped player = Game.Player.Character;
 
-        if (player == null ||
-            !player.Exists() ||
-            player.IsDead)
+        if (player == null || !player.Exists() || player.IsDead)
         {
             DeleteStone();
             return;
@@ -42,6 +39,7 @@ public class StoneAboveHead : Script
             return;
         }
 
+        // إنشاء الحجر
         if (stone == null || !stone.Exists())
         {
             stone = World.CreateProp(
@@ -62,7 +60,7 @@ public class StoneAboveHead : Script
         Vector3 headPosition =
             player.Bones[Bone.SkelHead].Position;
 
-        // الحجر على ارتفاع 3 أمتار
+        // الارتفاع 1.5 متر فوق الرأس
         stone.Position =
             headPosition + new Vector3(0f, 0f, Height);
 
@@ -73,12 +71,12 @@ public class StoneAboveHead : Script
             player.Heading
         );
 
-        // تعطيل التصادم بالكامل
+        // تعطيل التصادم باستخدام الهاش الكامل
         Function.Call(
-            (Hash)DisableCollisionHash,
+            (Hash)CollisionNative,
             stone.Handle,
-            true,
-            true
+            false,
+            false
         );
     }
 
