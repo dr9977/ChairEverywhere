@@ -1,6 +1,7 @@
 using System;
 using GTA;
 using GTA.Math;
+using GTA.Native;
 
 public class StoneAboveHead : Script
 {
@@ -9,7 +10,7 @@ public class StoneAboveHead : Script
     private readonly Model stoneModel =
         new Model("prop_rock_4_cl_2");
 
-    // 3 أمتار فوق الرأس
+    // ارتفاع الحجر: 3 أمتار فوق الرأس
     private const float Height = 3.0f;
 
     public StoneAboveHead()
@@ -53,18 +54,23 @@ public class StoneAboveHead : Script
             stone.IsPersistent = true;
         }
 
-        // تعطيل تصادم الحجر
-        stone.HasCollision = false;
+        // تعطيل تصادم الحجر باستخدام Native
+        Function.Call(
+            Hash.SET_ENTITY_COLLISION,
+            stone,
+            false,
+            false
+        );
 
-        // قراءة موقع الرأس
+        // موقع الرأس
         Vector3 headPosition =
             player.Bones[Bone.SkelHead].Position;
 
-        // 3 أمتار فوق الرأس
+        // وضع الحجر على ارتفاع 3 أمتار فوق الرأس
         stone.Position =
             headPosition + new Vector3(0f, 0f, Height);
 
-        // تدوير الحجر مع اتجاه الشخصية
+        // اتجاه الحجر مع الشخصية
         stone.Rotation = new Vector3(
             0f,
             0f,
@@ -75,7 +81,9 @@ public class StoneAboveHead : Script
     private void DeleteStone()
     {
         if (stone != null && stone.Exists())
+        {
             stone.Delete();
+        }
 
         stone = null;
     }
@@ -85,6 +93,8 @@ public class StoneAboveHead : Script
         DeleteStone();
 
         if (stoneModel.IsLoaded)
+        {
             stoneModel.MarkAsNoLongerNeeded();
+        }
     }
 }
