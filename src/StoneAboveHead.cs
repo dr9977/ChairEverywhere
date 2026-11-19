@@ -10,6 +10,7 @@ public class StoneAboveHead : Script
     private readonly Model stoneModel =
         new Model("prop_rock_4_cl_2");
 
+    // 3 أمتار فوق الرأس
     private const float Height = 3.0f;
 
     public StoneAboveHead()
@@ -51,27 +52,27 @@ public class StoneAboveHead : Script
             stone.IsPersistent = true;
         }
 
-        // تعطيل التصادم باستخدام Handle
-        Function.Call(
-            Hash.SET_ENTITY_COLLISION,
-            stone.Handle,
-            false,
-            false
-        );
-
-        // موقع الرأس
+        // تحديد موقع الرأس
         Vector3 headPosition =
             player.Bones[Bone.SkelHead].Position;
 
-        // الحجر فوق الرأس بثلاثة أمتار
+        // وضع الحجر 3 أمتار فوق الرأس
         stone.Position =
             headPosition + new Vector3(0f, 0f, Height);
 
-        // اتجاه الحجر
+        // تدوير الحجر مع اتجاه اللاعب
         stone.Rotation = new Vector3(
             0f,
             0f,
             player.Heading
+        );
+
+        // تعطيل التصادم مباشرة باستخدام Native Hash
+        Function.Call(
+            (Hash)0x1A9205C1B9EE827F,
+            stone.Handle,
+            false,
+            false
         );
     }
 
