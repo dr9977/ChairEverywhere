@@ -2,7 +2,6 @@
 using System;
 using GTA;
 using GTA.Math;
-using GTA.Native;
 
 public class StoneAboveHead : Script
 {
@@ -11,7 +10,7 @@ public class StoneAboveHead : Script
     private readonly Model stoneModel =
         new Model("prop_rock_4_cl_2");
 
-    private const int HeadBone = 31086;
+    // المسافة فوق الرأس: 50 سم
     private const float Height = 0.50f;
 
     public StoneAboveHead()
@@ -25,97 +24,64 @@ public class StoneAboveHead : Script
     {
         Ped player = Game.Player.Character;
 
-        if (player == null || !player.Exists() || player.IsDead)
+        if (player == null ||
+            !player.Exists() ||
+            player.IsDead)
+        {
+            DeleteStone();
             return;
+        }
+
+        if (!stoneModel.IsLoaded)
+        {
+            stoneModel.Request(1000);
+            return;
+        }
 
         if (stone == null || !stone.Exists())
         {
-            if (!stoneModel.IsInCdImage || !stoneModel.IsValid)
-                return;
-
-            if (!stoneModel.IsLoaded)
-                stoneModel.Request(1000);
-
-            if (!stoneModel.IsLoaded)
-                return;
-
             stone = World.CreateProp(
                 stoneModel,
                 player.Position,
+                Vector3.Zero,
                 false,
-                false
+                true
             );
 
             if (stone == null || !stone.Exists())
                 return;
 
-            Function.Call(
-                Hash.SET_ENTITY_AS_MISSION_ENTITY,
-                stone.Handle,
-                true,
-                true
-            );
+            stone.IsPersistent = true;
         }
 
-        // Stone only: disable collision
-        Function.Call(
-            Hash.SET_ENTITY_COLLISION,
-            stone.Handle,
-            false,
-            false
-        );
+        // قراءة موقع عظمة الرأس
+        Vector3 headPosition =
+            player.Bones[Bone.SkelHead].Position;
 
-        // Disable gravity and physics
-        Function.Call(
-            Hash.SET_ENTITY_HAS_GRAVITY,
-            stone.Handle,
-            false
-        );
+        // وضع الحجر على ارتفاع 50 سم فوق الرأس
+        stone.Position =
+            headPosition + new Vector3(0f, 0f, Height);
 
-        Function.Call(
-            Hash.SET_ENTITY_DYNAMIC,
-            stone.Handle,
-            false
-        );
-
-        // Get head position
-        Vector3 headPosition = Function.Call<Vector3>(
-            Hash.GET_PED_BONE_COORDS,
-            player.Handle,
-            HeadBone,
+        stone.Rotation = new Vector3(
             0f,
             0f,
-            0f
+            player.Heading
         );
+    }
 
-        // Position 50 cm above head
-        Vector3 targetPosition = new Vector3(
-            headPosition.X,
-            headPosition.Y,
-            headPosition.Z + Height
-        );
+    private void DeleteStone()
+    {
+        if (stone != null && stone.Exists())
+            stone.Delete();
 
-        // Move without physics
-        Function.Call(
-            Hash.SET_ENTITY_COORDS_NO_OFFSET,
-            stone.Handle,
-            targetPosition.X,
-            targetPosition.Y,
-            targetPosition.Z,
-            false,
-            false,
-            false
-        );
-
-        stone.Heading = player.Heading;
+        stone = null;
     }
 
     private void OnAborted(object sender, EventArgs e)
     {
-        if (stone != null && stone.Exists())
-        {
-            stone.Delete();
-            stone = null;
-        }
+        DeleteStone();
+
+        if (stoneModel.IsLoaded)
+            stoneModel.MarkAsNoLongerNeeded();
     }
 }
