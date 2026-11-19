@@ -10,7 +10,6 @@ public class StoneAboveHead : Script
     private readonly Model stoneModel =
         new Model("prop_rock_4_cl_2");
 
-    // ارتفاع الحجر: 3 أمتار فوق الرأس
     private const float Height = 3.0f;
 
     public StoneAboveHead()
@@ -24,9 +23,7 @@ public class StoneAboveHead : Script
     {
         Ped player = Game.Player.Character;
 
-        if (player == null ||
-            !player.Exists() ||
-            player.IsDead)
+        if (player == null || !player.Exists() || player.IsDead)
         {
             DeleteStone();
             return;
@@ -54,10 +51,10 @@ public class StoneAboveHead : Script
             stone.IsPersistent = true;
         }
 
-        // تعطيل تصادم الحجر باستخدام Native
+        // تعطيل التصادم باستخدام Handle
         Function.Call(
             Hash.SET_ENTITY_COLLISION,
-            stone,
+            stone.Handle,
             false,
             false
         );
@@ -66,11 +63,11 @@ public class StoneAboveHead : Script
         Vector3 headPosition =
             player.Bones[Bone.SkelHead].Position;
 
-        // وضع الحجر على ارتفاع 3 أمتار فوق الرأس
+        // الحجر فوق الرأس بثلاثة أمتار
         stone.Position =
             headPosition + new Vector3(0f, 0f, Height);
 
-        // اتجاه الحجر مع الشخصية
+        // اتجاه الحجر
         stone.Rotation = new Vector3(
             0f,
             0f,
@@ -81,9 +78,7 @@ public class StoneAboveHead : Script
     private void DeleteStone()
     {
         if (stone != null && stone.Exists())
-        {
             stone.Delete();
-        }
 
         stone = null;
     }
@@ -93,8 +88,6 @@ public class StoneAboveHead : Script
         DeleteStone();
 
         if (stoneModel.IsLoaded)
-        {
             stoneModel.MarkAsNoLongerNeeded();
-        }
     }
 }
