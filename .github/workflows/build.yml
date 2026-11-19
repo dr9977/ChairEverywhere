@@ -1,4 +1,3 @@
-
 name: Build GTA V Mods
 
 on:
@@ -33,6 +32,13 @@ jobs:
       - name: Build Stone
         run: dotnet build src/StoneAboveHead.csproj -c Release --no-restore
 
+      # Build FruitCollect
+      - name: Restore Fruit
+        run: dotnet restore src/FruitCollect.csproj
+
+      - name: Build Fruit
+        run: dotnet build src/FruitCollect.csproj -c Release --no-restore
+
       # Upload Chair DLL
       - name: Upload Chair DLL
         uses: actions/upload-artifact@v4
@@ -46,3 +52,10 @@ jobs:
         with:
           name: StoneAboveHead-DLL
           path: src/bin/Release/net48/StoneAboveHead.dll
+
+      # Upload Fruit DLL
+      - name: Upload Fruit DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: FruitCollect-DLL
+          path: src/bin/Release/net48/FruitCollect.dll
