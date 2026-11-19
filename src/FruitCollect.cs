@@ -74,7 +74,9 @@ public class FruitCollect : Script
                 respawnTimes[i] =
                     DateTime.UtcNow.AddSeconds(RespawnDelaySeconds);
 
-                UI.ShowSubtitle("Fruit collected: " + collected);
+                GTA.UI.Screen.ShowSubtitle(
+                    "Fruit collected: " + collected
+                );
             }
         }
     }
@@ -155,4 +157,3 @@ public class FruitCollect : Script
         }
     }
 }
-
