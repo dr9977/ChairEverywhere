@@ -1,4 +1,3 @@
-
 using System;
 using GTA;
 using GTA.Math;
@@ -10,8 +9,8 @@ public class StoneAboveHead : Script
     private readonly Model stoneModel =
         new Model("prop_rock_4_cl_2");
 
-    // المسافة فوق الرأس: 50 سم
-    private const float Height = 0.50f;
+    // 3 أمتار فوق الرأس
+    private const float Height = 3.0f;
 
     public StoneAboveHead()
     {
@@ -54,14 +53,18 @@ public class StoneAboveHead : Script
             stone.IsPersistent = true;
         }
 
-        // قراءة موقع عظمة الرأس
+        // تعطيل تصادم الحجر
+        stone.HasCollision = false;
+
+        // قراءة موقع الرأس
         Vector3 headPosition =
             player.Bones[Bone.SkelHead].Position;
 
-        // وضع الحجر على ارتفاع 50 سم فوق الرأس
+        // 3 أمتار فوق الرأس
         stone.Position =
             headPosition + new Vector3(0f, 0f, Height);
 
+        // تدوير الحجر مع اتجاه الشخصية
         stone.Rotation = new Vector3(
             0f,
             0f,
