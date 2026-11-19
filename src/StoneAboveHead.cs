@@ -10,8 +10,8 @@ public class StoneAboveHead : Script
     private readonly Model stoneModel =
         new Model("prop_rock_4_cl_2");
 
-    // ارتفاع الحجر متر واحد فوق الرأس
-    private const float Height = 1.0f;
+    // ارتفاع الحجر متر ونصف فوق الرأس
+    private const float Height = 1.5f;
 
     // Native SET_ENTITY_COLLISION
     private const ulong CollisionNative = 0x1A9205C1B9EE827F;
@@ -62,7 +62,7 @@ public class StoneAboveHead : Script
         Vector3 headPosition =
             player.Bones[Bone.SkelHead].Position;
 
-        // متر واحد فوق الرأس
+        // متر ونصف فوق الرأس
         stone.Position =
             headPosition + new Vector3(0f, 0f, Height);
 
